@@ -1,131 +1,153 @@
-#include<iostream>
+#include<bits/stdc++.h>
 using namespace std;
 
-struct node{
-	int c, e;
-	struct node *next;
+class Poly {
+    private:
+        Poly *next;
+        int exp;
+        int coef;
+    public:
+        Poly();
+        Poly(int e, int c);
+        void add(int e, int c);
+        void print();
+        Poly operator+(Poly B)
+        {
+            Poly result;
+            Poly *a = next, *b = B.next;
+            while(a != nullptr||b != nullptr)
+            {
+                if(a!= nullptr&&b != nullptr&&a -> exp == b -> exp)
+                {
+                    result.add(a -> exp, a -> coef + b -> coef);
+                    a = a -> next;
+                    b = b -> next;
+                }
+                else if(b == nullptr||(a!= nullptr&&a -> exp > b -> exp))
+                {
+                    result.add(a -> exp, a -> coef);
+                    a = a -> next;
+                }
+                else if(a == nullptr||(b!= nullptr&&b -> exp > a -> exp))
+                {
+                    result.add(b -> exp, b -> coef);
+                    b = b -> next;
+                }
+            }
+            return result;
+        }
+        Poly operator*(Poly B)
+        {
+            Poly result;
+            Poly *a = next, *b = B.next;
+            while(a != nullptr||b != nullptr)
+            {
+                if(a!= nullptr&&b != nullptr&&a -> exp == b -> exp)
+                {
+                    result.add(a -> exp, a -> coef + b -> coef);
+                    a = a -> next;
+                    b = b -> next;
+                }
+                else if(b == nullptr||(a!= nullptr&&a -> exp > b -> exp))
+                {
+                    result.add(a -> exp, a -> coef);
+                    a = a -> next;
+                }
+                else if(a == nullptr||(b!= nullptr&&b -> exp > a -> exp))
+                {
+                    result.add(b -> exp, b -> coef);
+                    b = b -> next;
+                }
+            }
+            return result;
+        }
+        void operator=(Poly *b)
+        {
+            exp = b -> exp;
+            coef = b -> coef;
+            next = b -> next;
+        }
 };
 
-class Poly{
-	public:
-		struct node *list = NULL;
-		struct node *sorted = NULL;
-		add(int c, int e){
-			struct node *p = new node();
-			p -> c = c;
-			p -> e = e;
-			if(list == NULL){
-				p -> next = NULL;
-			}
-			else{
-				p -> next = list;
-			}
-			list = p;
-		}
-		sort(){
-			while(list != NULL)
-			{
-				struct node *p = new node();
-				p -> c = list -> c;
-				p -> e = list -> e;
-				if(sorted == NULL){
-					sorted = p;
-					sorted -> next = NULL;
-				}
-				else{
-					struct node *n = sorted;
-					struct node *t = sorted;
-					while(n -> next != NULL&&n -> e > list -> e){
-						t = n;
-						n = n -> next;
-					}
-					if(n -> e > list -> e)
-					{
-						t = n;
-						n = n -> next;
-					}
-					if(n != NULL&&n -> e == list -> e)
-					{
-						n -> c += list -> c;
-						if(n -> c == 0)
-						{
-							if(t != n)t -> next = n -> next;
-							else{
-								sorted = NULL;
-							}
-							delete(n);
-						}
-					}
-					else if(n == NULL){
-						t -> next = p;
-						p -> next = NULL;
-					}
-					else if(n == sorted)
-					{
-						p -> next = n;
-						sorted = p;
-					}
-					else{
-						t -> next = p;
-						p -> next = n;
-					}
-				}
-				struct node *t = list;
-				list = list -> next;
-				delete(t);
-			}
-		}
-		Poly operator+(const Poly B){
-			Poly C;
-			struct node *p = sorted;
-			while(p != NULL)
-			{
-				C.add(p -> c, p -> e);
-				p = p -> next;
-			}
-			p = B.sorted;
-			while(p != NULL)
-			{
-				C.add(p -> c, p -> e);
-				p = p -> next;
-			}
-			return C;
-		}
-		print(){
-			if(sorted == NULL){cout << "0 0" << endl;}
-			while(sorted != NULL)
-			{
-				cout << sorted -> c << " " << sorted -> e << endl;
-				sorted = sorted -> next;
-			}
-		}
-};
+Poly::Poly(int e, int c){
+    exp = e;
+    coef = c;
+    next = nullptr;
+}
 
-int main(){
-	int n, q, c, e, t = 0;
-	while(cin >> n)
-	{
-		t++;
-		Poly A, B, C, D;
-		for(int i = 0; n > i; i++)
-		{
-			cin >> c >> e;
-			A.add(c, e);
-		}
-		cin >> q;
-		for(int i = 0; q > i; i++)
-		{
-			cin >> c >> e;
-			B.add(c, e);
-		}
-		if(q == 0&&n == 0){break;}
-		A.sort();
-		B.sort();
-		C = A + B;
-		C.sort();
-		cout << "Case" << t << ":" << endl << "ADD" << endl;
-		C.print();
-		cout << "MULTIPLY" << endl;
-	}
-	
-} 
+Poly::Poly(){
+    exp = 0;
+    coef = 0;
+    next = nullptr;
+}
+
+void Poly::add(int e, int c)
+{
+    if(next == nullptr)
+    {
+        next = new Poly(e, c);
+        return;
+    }
+    Poly *p = this;
+    while(p -> next != nullptr&&p -> next -> exp > e)
+    {
+        p = p -> next;
+    }
+    if(p -> next != nullptr&&p -> next -> exp == e)
+    {
+        p -> next -> coef += c;
+        if(p -> next -> coef == 0)
+        {
+            Poly *temp = p -> next;
+            p -> next = temp -> next;
+            delete temp;
+        }
+    }
+    else
+    {
+        Poly *temp = new Poly(e, c);
+        temp -> next = p -> next;
+        p -> next = temp;
+    }
+}
+
+void Poly::print()
+{
+    Poly *p = next;
+    while(p != nullptr)
+    {
+        cout << p -> coef << " " << p -> exp << endl;
+        p = p -> next;
+    }
+}
+
+int main()
+{
+    int p, q, e, c, t = 1;
+    while(cin >> p)
+    {
+        Poly A, B, C, D;
+        for(int i = 0; i < p; i++)
+        {
+            cin >> c >> e;
+            A.add(e, c);
+        }
+        cin >> q;
+        if(!p&&!q)
+            break;
+        for(int i = 0; i < q; i++)
+        {
+            cin >> c >> e;
+            B.add(e, c);
+        }
+        cout << "Case" << t << ":\n";
+        C = A + B;
+        cout << "ADD\n";
+        C.print();
+        cout << "MULTIPLY\n";
+        D = A * B;
+        D.print();
+        t++;
+    }
+    return 0;
+}
