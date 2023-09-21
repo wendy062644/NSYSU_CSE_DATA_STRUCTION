@@ -15,49 +15,31 @@ class Poly {
         {
             Poly result;
             Poly *a = next, *b = B.next;
-            while(a != nullptr||b != nullptr)
+            while(a != nullptr)
             {
-                if(a!= nullptr&&b != nullptr&&a -> exp == b -> exp)
-                {
-                    result.add(a -> exp, a -> coef + b -> coef);
-                    a = a -> next;
-                    b = b -> next;
-                }
-                else if(b == nullptr||(a!= nullptr&&a -> exp > b -> exp))
-                {
-                    result.add(a -> exp, a -> coef);
-                    a = a -> next;
-                }
-                else if(a == nullptr||(b!= nullptr&&b -> exp > a -> exp))
-                {
-                    result.add(b -> exp, b -> coef);
-                    b = b -> next;
-                }
+                result.add(a -> exp, a -> coef);
+                a = a -> next;
+            }
+            while(b != nullptr)
+            {
+                result.add(b -> exp, b -> coef);
+                b = b -> next;
             }
             return result;
         }
         Poly operator*(Poly B)
         {
             Poly result;
-            Poly *a = next, *b = B.next;
-            while(a != nullptr||b != nullptr)
+            Poly *a = next, *b;
+            while(a != nullptr)
             {
-                if(a!= nullptr&&b != nullptr&&a -> exp == b -> exp)
+                b = B.next;
+                while(b != nullptr)
                 {
-                    result.add(a -> exp, a -> coef + b -> coef);
-                    a = a -> next;
+                    result.add(a -> exp + b -> exp, a -> coef * b -> coef);
                     b = b -> next;
                 }
-                else if(b == nullptr||(a!= nullptr&&a -> exp > b -> exp))
-                {
-                    result.add(a -> exp, a -> coef);
-                    a = a -> next;
-                }
-                else if(a == nullptr||(b!= nullptr&&b -> exp > a -> exp))
-                {
-                    result.add(b -> exp, b -> coef);
-                    b = b -> next;
-                }
+                a = a -> next;
             }
             return result;
         }
@@ -114,6 +96,8 @@ void Poly::add(int e, int c)
 void Poly::print()
 {
     Poly *p = next;
+    if(p == nullptr)
+        cout << "0 0\n";
     while(p != nullptr)
     {
         cout << p -> coef << " " << p -> exp << endl;
